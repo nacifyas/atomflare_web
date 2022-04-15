@@ -40,7 +40,7 @@ async def update_image(image: ImageUpdate) -> None:
 
 
 @router.delete('/{image_id}', status_code=status.HTTP_200_OK)
-async def get_image_by_id(image_id: int) -> None:
+async def delete_imaged(image_id: int) -> None:
     async with async_session() as session:
         async with session.begin():
             image_dal = ImageDAL(session)

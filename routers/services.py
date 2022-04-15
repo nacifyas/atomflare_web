@@ -40,7 +40,7 @@ async def update_service(service: ServiceUpdate):
 
 
 @router.delete("/{service_id}", status_code=status.HTTP_200_OK)
-async def update_service(service_id: int):
+async def delete_service(service_id: int):
     async with async_session() as session:
         async with session.begin():
             service_dal = ServiceDAL(session)
