@@ -1,11 +1,12 @@
 import uvicorn
-from routers import images
+from routers import images, services
 from fastapi import FastAPI
 from sql.database import engine, Base
 
 app = FastAPI()
 
 app.include_router(images.router)
+app.include_router(services.router)
 
 # @app.on_event("startup")
 # async def startup():

@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-
 class ImageBase(BaseModel):
     title: str
     description: str

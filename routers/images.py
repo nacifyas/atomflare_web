@@ -7,8 +7,7 @@ router = APIRouter(
     prefix = "/gallery"
 )
 
-# @router.get('/', response_model=list[Image], status_code=status.HTTP_200_OK)
-@router.get('/')
+@router.get('/', response_model=list[Image], status_code=status.HTTP_200_OK)
 async def get_gallery(limit: int = 50, skip: int = 0) -> list[Image]:
     async with async_session() as session:
         async with session.begin():
@@ -16,8 +15,7 @@ async def get_gallery(limit: int = 50, skip: int = 0) -> list[Image]:
             return await imageStream.get_all_images(limit, skip)
 
 
-# @router.get('/{image_id}', response_model=Image, status_code=status.HTTP_200_OK)
-@router.get('/{image_id}')
+@router.get('/{image_id}', response_model=Image, status_code=status.HTTP_200_OK)
 async def get_image_by_id(image_id: int) -> Image:
     async with async_session() as session:
         async with session.begin():
@@ -25,8 +23,7 @@ async def get_image_by_id(image_id: int) -> Image:
             return await image_dal.get_by_id(image_id)
 
 
-# @router.post('/', response_model=Image, status_code=status.HTTP_201_CREATED)
-@router.post('/',)
+@router.post('/', response_model=Image, status_code=status.HTTP_201_CREATED)
 async def create_image(image: ImageCreate) -> Image:
     async with async_session() as session:
         async with session.begin():

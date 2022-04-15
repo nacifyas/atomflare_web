@@ -1,0 +1,46 @@
+GET http://localhost:8000/
+
+
+###################################################### Gallery
+
+###
+
+GET http://localhost:8000/gallery/
+
+###
+
+GET http://localhost:8000/gallery/1
+
+####################################
+
+POST http://localhost:8000/gallery/
+content-type: application/json
+
+{
+    "title": "sample",
+    "description": "TEST2"
+}
+
+##########
+###################################################### Services
+
+### 
+
+GET http://localhost:8000/services/
+
+###
+
+GET http://localhost:8000/services/1
+
+####################################
+
+POST http://localhost:8000/services/
+content-type: application/json
+
+{
+    "name": "Service",
+    "description": "Super Duper Cool Service",
+    "logo": "path",
+    "link": "patth1"
+}
+
