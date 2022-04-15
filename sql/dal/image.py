@@ -4,7 +4,7 @@ from sql.sqlmodels import ImageDB
 from models.image import Image, ImageCreate
 
 def normalize(image: ImageDB) -> Image:
-    return Image(id=image.id, description=image.description, title=image.title)
+    return Image(id=image.id, description=image.description, title=image.title, url=image.url)
 
 class ImageDAL():
     def __init__(self, db_session: Session):

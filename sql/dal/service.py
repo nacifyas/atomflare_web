@@ -4,7 +4,7 @@ from sql.sqlmodels import ServiceDB
 from models.service import Service, ServiceCreate
 
 def normalize(service: ServiceDB) -> Service:
-    return Service(id=service.id, name=service.name, description=service.description, logo=service.logo, link=service.link)
+    return Service(id=service.id, name=service.name, description=service.description, logo=service.logo, link=service.link, visibility=service.visibility)
 
 class ServiceDAL():
     def __init__(self, db_session: Session):

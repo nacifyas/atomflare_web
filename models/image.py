@@ -3,6 +3,7 @@ from pydantic import BaseModel
 class ImageBase(BaseModel):
     title: str
     description: str
+    url: str
 
 class ImageCreate(ImageBase):
     pass

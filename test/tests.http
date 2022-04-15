@@ -18,7 +18,8 @@ content-type: application/json
 
 {
     "title": "sample",
-    "description": "TEST2"
+    "description": "TEST2",
+    "url": "path"
 }
 
 ##########
