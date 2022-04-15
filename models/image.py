@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class ImageBase(BaseModel):
     title: str
@@ -10,6 +11,14 @@ class ImageCreate(ImageBase):
 
 class Image(ImageBase):
     id: int
+
+    class Config:
+        orm_mode = True
+
+class ImageUpdate(BaseModel):
+    id: int
+    title: Optional[str] = None
+    description: Optional[str] = None
 
     class Config:
         orm_mode = True

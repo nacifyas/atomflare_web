@@ -9,7 +9,7 @@ GET http://localhost:8000/gallery/
 
 ###
 
-GET http://localhost:8000/gallery/1
+GET http://localhost:8000/gallery/3
 
 ####################################
 
@@ -22,7 +22,22 @@ content-type: application/json
     "url": "path"
 }
 
-##########
+########
+
+PUT http://localhost:8000/gallery/
+content-type: application/json
+
+{
+    "id": 3,
+    "title": "GOING TO DELETE YA",
+    "description": "DELETE ME",
+    "jjgjhghgj": "damn DELETE ME"
+}
+
+###
+
+DELETE http://localhost:8000/gallery/3/
+
 ###################################################### Services
 
 ### 
@@ -31,7 +46,7 @@ GET http://localhost:8000/services/
 
 ###
 
-GET http://localhost:8000/services/1
+GET http://localhost:8000/services/15
 
 ####################################
 
@@ -39,9 +54,26 @@ POST http://localhost:8000/services/
 content-type: application/json
 
 {
-    "name": "Service",
-    "description": "Super Duper Cool Service",
-    "logo": "path",
-    "link": "patth1"
+    "name": "delete Sample",
+    "description": "Super Duper Cool Service TO DELETE",
+    "logo": "DELETE",
+    "link": "patth to link"
 }
 
+###
+
+PUT http://localhost:8000/services/
+content-type: application/json
+
+{
+    "id": 1,
+    # "name": "Service UPDATE c:",
+    # "description": "Super Duper Cool Service",
+    # "logo": "123path123",
+    # "link": "path5",
+    "visibility": "true"
+}
+
+###
+
+DELETE http://localhost:8000/services/16

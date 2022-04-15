@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
 from sql.sqlmodels import ImageDB
-from models.image import Image, ImageCreate
+from models.image import Image, ImageCreate, ImageUpdate
+from sqlalchemy import update, delete
 
 def normalize(image: ImageDB) -> Image:
     return Image(id=image.id, description=image.description, title=image.title, url=image.url)
@@ -23,3 +24,17 @@ class ImageDAL():
         self.db_session.add(new_image)
         await self.db_session.flush()
         return new_image
+
+    async def update_image(self, image: ImageUpdate) -> None:
+        query = update(ImageDB).where(ImageDB.id == image.id)
+        if image.title:
+            query = query.values(title=image.title)
+        if image.description:
+            query = query.values(description=image.description)
+        query.execution_options(synchronize_session="fetch")
+        await self.db_session.execute(query)
+
+    async def delete_image(self, id: int) -> None:
+        query = delete(ImageDB).where(ImageDB.id == id)
+        query.execution_options(synchronize_session="fetch")
+        await self.db_session.execute(query)

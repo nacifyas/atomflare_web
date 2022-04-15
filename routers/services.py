@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from sql.dal.service import ServiceDAL
-from models.service import Service, ServiceCreate
+from models.service import Service, ServiceCreate, ServiceUpdate
 from sql.database import async_session
 
 router = APIRouter(
@@ -29,3 +29,19 @@ async def create_service(service: ServiceCreate) -> Service:
         async with session.begin():
             new_service = ServiceDAL(session)
             return await new_service.create_service(service)
+
+
+@router.put("/", status_code=status.HTTP_202_ACCEPTED)
+async def update_service(service: ServiceUpdate):
+    async with async_session() as session:
+        async with session.begin():
+            service_dal = ServiceDAL(session)
+            await service_dal.update_service(service)
+
+
+@router.delete("/{service_id}", status_code=status.HTTP_200_OK)
+async def update_service(service_id: int):
+    async with async_session() as session:
+        async with session.begin():
+            service_dal = ServiceDAL(session)
+            await service_dal.delete_service(service_id)
