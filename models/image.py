@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-import sql.models as QuerriedImage
+
 
 class ImageBase(BaseModel):
     title: str
