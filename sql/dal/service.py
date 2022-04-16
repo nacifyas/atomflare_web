@@ -5,7 +5,10 @@ from models.service import Service, ServiceCreate, ServiceUpdate
 from sqlalchemy import delete, update
 
 def normalize(service: ServiceDB) -> Service:
-    return Service(id=service.id, name=service.name, description=service.description, logo=service.logo, link=service.link, visibility=service.visibility)
+    if service:
+        return Service(id=service.id, name=service.name, description=service.description, logo=service.logo, link=service.link, visibility=service.visibility)
+    else:
+        return None
 
 class ServiceDAL():
     def __init__(self, db_session: Session):
@@ -39,9 +42,10 @@ class ServiceDAL():
         query.execution_options(synchronize_session="fetch")
         await self.db_session.execute(query)
         
-
     async def delete_service(self, id: int) -> None:
         query = delete(ServiceDB).where(ServiceDB.id == id)
         query.execution_options(synchronize_session="fetch")
         await self.db_session.execute(query)
+        
+
         

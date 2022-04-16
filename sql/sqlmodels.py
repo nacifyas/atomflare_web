@@ -7,16 +7,17 @@ class ImageDB(Base):
     __tablename__ = 'images'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=False)
+    title = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
-    url = Column(String, nullable=False)
+    url = Column(String, nullable=False, unique=True)
+
 
 class ServiceDB(Base):
     __tablename__ = 'services'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
-    logo = Column(String, nullable=False)
-    link = Column(String, nullable=False)
-    visibility = Column(Boolean, nullable=False)
+    logo = Column(String, nullable=False, unique=True)
+    link = Column(String, nullable=False, unique=True)
+    visibility = Column(Boolean, nullable=False, default=True)

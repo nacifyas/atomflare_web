@@ -1,7 +1,8 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
+from fastapi.responses import Response
 from sql.dal.image import ImageDAL
-from models.image import Image, ImageCreate, ImageUpdate
 from sql.database import async_session
+from models.image import Image, ImageCreate, ImageUpdate
 
 router = APIRouter(
     prefix = "/gallery"
@@ -20,28 +21,42 @@ async def get_image_by_id(image_id: int) -> Image:
     async with async_session() as session:
         async with session.begin():
             image_dal = ImageDAL(session)
-            return await image_dal.get_by_id(image_id)
-
+            ret = await image_dal.get_by_id(image_id)
+            if ret:
+                return ret
+            else:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
+                
 
 @router.post('/', response_model=Image, status_code=status.HTTP_201_CREATED)
 async def create_image(image: ImageCreate) -> Image:
     async with async_session() as session:
         async with session.begin():
             new_image = ImageDAL(session)
-            return await new_image.create_image(image)
+            try:
+                return await new_image.create_image(image)
+            except Exception:
+                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The input data is not valid")
 
 
-@router.put("/", response_model=ImageUpdate, status_code=status.HTTP_202_ACCEPTED)
+
+@router.put("/", status_code=status.HTTP_204_NO_CONTENT)
 async def update_image(image: ImageUpdate) -> None:
     async with async_session() as session:
         async with session.begin():
             image_dal = ImageDAL(session)
-            await image_dal.update_image(image)
+            try:
+                await image_dal.update_image(image)
+            except Exception:
+                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The input data is not valid")
+            else:
+                return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.delete('/{image_id}', status_code=status.HTTP_200_OK)
+@router.delete('/{image_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_imaged(image_id: int) -> None:
     async with async_session() as session:
         async with session.begin():
             image_dal = ImageDAL(session)
             await image_dal.delete_image(image_id)
+            return Response(status_code=status.HTTP_204_NO_CONTENT)

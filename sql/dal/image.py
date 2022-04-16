@@ -5,7 +5,10 @@ from models.image import Image, ImageCreate, ImageUpdate
 from sqlalchemy import update, delete
 
 def normalize(image: ImageDB) -> Image:
-    return Image(id=image.id, description=image.description, title=image.title, url=image.url)
+    if image:    
+        return Image(id=image.id, description=image.description, title=image.title, url=image.url)
+    else: 
+        return None
 
 class ImageDAL():
     def __init__(self, db_session: Session):

@@ -1,11 +1,12 @@
 from typing import Optional
+from fastapi import Query
 from pydantic import BaseModel
 
 class ServiceBase(BaseModel):
-    name: str
-    description: str
-    logo: str
-    link: str
+    name: Optional[str] = Query(..., min_length=3, max_length=75)
+    description: Optional[str] = Query(..., min_length=3, max_length=140)
+    logo: str = Query(..., regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
+    link: str = Query(..., regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
     visibility: Optional[bool] = True
 
 class ServiceCreate(ServiceBase):
@@ -20,10 +21,10 @@ class Service(ServiceBase):
 
 class ServiceUpdate(BaseModel):
     id: int
-    name: Optional[str] = None
-    description: Optional[str] = None
-    logo: Optional[str] = None
-    link: Optional[str] = None
+    name: Optional[str] = Query(None, min_length=3, max_length=75)
+    description: Optional[str] = Query(None, min_length=3, max_length=140)
+    logo: str = Query(None, regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
+    link: str = Query(None, regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
     visibility: Optional[bool] = None
 
     class Config:
