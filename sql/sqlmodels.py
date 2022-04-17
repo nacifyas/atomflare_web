@@ -1,16 +1,9 @@
+from email.policy import default
+from enum import unique
+from django.forms import BooleanField
 from sqlalchemy import Column, Integer, String, Boolean
 
 from .database import Base
-
-
-class ImageDB(Base):
-    __tablename__ = 'images'
-
-    id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=False, unique=True)
-    description = Column(String, nullable=False)
-    url = Column(String, nullable=False, unique=True)
-
 
 class ServiceDB(Base):
     __tablename__ = 'services'
@@ -18,6 +11,15 @@ class ServiceDB(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
-    logo = Column(String, nullable=False, unique=True)
+    logo = Column(String, nullable=False)
     link = Column(String, nullable=False, unique=True)
-    visibility = Column(Boolean, nullable=False, default=True)
+    is_visible = Column(Boolean, nullable=False, default=True)
+
+class UserDB(Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False, unique=True)
+    hashed_password = Column(String, nullable=False)
+    is_admin = Column(Boolean, nullable=False, default=False)

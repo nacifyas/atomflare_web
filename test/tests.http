@@ -1,47 +1,10 @@
 GET http://localhost:8000/
 
-
-###################################################### Gallery
-
-###
-
-GET http://localhost:8000/gallery/
-
-###
-
-GET http://localhost:8000/gallery/6
-
-####################################
-
-POST http://localhost:8000/gallery/
-content-type: application/json
-
-{
-    "title": "esd2",
-    "description": "TEST2",
-    "url": "path2.jpeg"
-}
-
-########
-
-PUT http://localhost:8000/gallery/
-content-type: application/json
-
-{
-    "id": 10,
-    "title": "MODIFIED",
-    "description": "DELETasdE ME"
-}
-
-###
-
-DELETE http://localhost:8000/gallery/1/
-
 ###################################################### Services
 
 ### 
 
-GET http://localhost:8000/services/?skip=2
+GET http://localhost:8000/services/
 
 ###
 
@@ -53,10 +16,10 @@ POST http://localhost:8000/services/
 content-type: application/json
 
 {
-    "name": "delete Sample",
-    "description": "Super Duper Cool Service TO DELETE",
-    "logo": "DELETE",
-    "link": "patth to link"
+    "name": "Another cool service3",
+    "description": "Yep, again, again, AGAIN",
+    "logo": "logo.png",
+    "link": "mySuperAppPPP.com"
 }
 
 ###

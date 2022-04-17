@@ -7,7 +7,7 @@ class ServiceBase(BaseModel):
     description: Optional[str] = Query(..., min_length=3, max_length=140)
     logo: str = Query(..., regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
     link: str = Query(..., regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
-    visibility: Optional[bool] = True
+    is_visible: Optional[bool] = True
 
 class ServiceCreate(ServiceBase):
     pass

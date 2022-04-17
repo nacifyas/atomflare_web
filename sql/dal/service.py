@@ -6,7 +6,7 @@ from sqlalchemy import delete, update
 
 def normalize(service: ServiceDB) -> Service:
     if service:
-        return Service(id=service.id, name=service.name, description=service.description, logo=service.logo, link=service.link, visibility=service.visibility)
+        return Service(id=service.id, name=service.name, description=service.description, logo=service.logo, link=service.link, is_visible=service.is_visible)
     else:
         return None
 
@@ -38,7 +38,7 @@ class ServiceDAL():
             query = query.values(logo=service.logo)
         if service.link:
             query = query.values(link=service.link)
-        query = query.values(visibility=service.visibility)
+        query = query.values(is_visible=service.is_visibility)
         query.execution_options(synchronize_session="fetch")
         await self.db_session.execute(query)
         
