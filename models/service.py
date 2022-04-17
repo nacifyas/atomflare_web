@@ -25,7 +25,7 @@ class ServiceUpdate(BaseModel):
     description: Optional[str] = Query(None, min_length=3, max_length=140)
     logo: str = Query(None, regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
     link: str = Query(None, regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
-    visibility: Optional[bool] = None
+    is_visible: Optional[bool] = None
 
     class Config:
         orm_mode = True
