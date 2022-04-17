@@ -1,69 +1,58 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
-from passlib.context import CryptContext
-from models.user import User
-from auth.tokens import ALGORITHM, SECRET_KEY, TokenData
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from auth.dependencies import current_user_admin, get_password_hash, oauth2_scheme
+from sql.dal.user import UserDAL
+from sql.database import async_session
+from models.user import UserRead, UserCreate, UserUpdate
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter(
-    prefix="/users"
+    prefix="/users",
+    dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)]
 )
 
-def get_user(db, username: str):
-    # if username in db:
-    #     user_dict = db[username]
-    #     return UserDB(**user_dict)
-    pass
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
-    user = get_user('users_db', username=token_data.username)
-    if user is None:
-        raise credentials_exception
-    return user
+@router.get("/", response_model=list[UserRead])
+async def get_users(limit: int = 20, skip: int = 0) -> list[UserRead]:
+    async with async_session() as session:
+        async with session.begin():
+            userStream = UserDAL(session)
+            stream = await userStream.get_all_users(limit, skip)
+            return [UserRead(**user.dict()) for user in stream]
 
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
+@router.post('/', response_model=UserRead, status_code=status.HTTP_201_CREATED)
+async def create_user(user: UserCreate) -> None:
+    async with async_session() as session:
+        async with session.begin():
+            new_user = UserDAL(session)
+            try:
+                user.hashed_password=get_password_hash(user.hashed_password)
+                await new_user.create_user(user)
+                return Response(status_code=status.HTTP_204_NO_CONTENT)
+            except Exception:
+                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The input data is not valid")
 
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+@router.put("/", status_code=status.HTTP_204_NO_CONTENT)
+async def update_user(user: UserUpdate) -> None:
+    async with async_session() as session:
+        async with session.begin():
+            user_dal = UserDAL(session)
+            try:
+                user.hashed_password=get_password_hash(user.hashed_password)
+                await user_dal.update_user(user)
+            except Exception:
+                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The input data is not valid")
+            else:
+                return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
-    if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
-        return False
-    return user
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user_id: int) -> None:
+    async with async_session() as session:
+        async with session.begin():
+            user_dal = UserDAL(session)
+            await user_dal.delete_user(user_id)
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@router.get("/users/me/", response_model=User)
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return current_user
-
-
-@router.get("/users/me/items/")
-async def read_own_items(current_user: User = Depends(get_current_active_user)):
-    return [{"item_id": "Foo", "owner": current_user.username}]
-
+        
