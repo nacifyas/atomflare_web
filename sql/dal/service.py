@@ -6,7 +6,7 @@ from sqlalchemy import delete, update
 
 def normalize(service: ServiceDB) -> Service:
     if service:
-        return Service(id=service.id, name=service.name, description=service.description, logo=service.logo, link=service.link, is_visible=service.is_visible)
+        return Service(**service.__dict__)
     else:
         return None
 

@@ -6,7 +6,7 @@ from sqlalchemy import delete, update
 
 def normalize(user: UserDB) -> User:
     if user:
-        return User(id=user.id, name=user.name, username=user.username, hashed_password=user.hashed_password, is_admin=user.is_admin)
+        return User(**user.__dict__)
     else:
         return None    
 
