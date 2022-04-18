@@ -1,9 +1,7 @@
-from email.policy import default
-from enum import unique
-from django.forms import BooleanField
 from sqlalchemy import Column, Integer, String, Boolean
 
 from .database import Base
+metadata = Base.metadata
 
 class ServiceDB(Base):
     __tablename__ = 'services'
