@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean
-
 from .database import Base
+
 metadata = Base.metadata
 
 class ServiceDB(Base):
@@ -12,6 +12,7 @@ class ServiceDB(Base):
     logo = Column(String, nullable=False)
     link = Column(String, nullable=False, unique=True)
     is_visible = Column(Boolean, nullable=False, default=True)
+    # test_mig = Column(String)
 
 class UserDB(Base):
     __tablename__ = 'users'
