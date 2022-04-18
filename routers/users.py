@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from auth.dependencies import current_user_admin, get_password_hash, oauth2_scheme
+from auth.dependencies import current_user_admin, get_current_user, get_password_hash, oauth2_scheme
 from sql.dal.user import UserDAL
 from sql.database import async_session
 from models.user import UserRead, UserCreate, UserUpdate
@@ -33,13 +33,13 @@ async def create_user(user: UserCreate) -> None:
                 raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The input data is not valid")
 
 
-@router.put("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/", status_code=status.HTTP_204_NO_CONTENT, dependencies=get_current_user)
 async def update_user(user: UserUpdate) -> None:
     async with async_session() as session:
         async with session.begin():
             user_dal = UserDAL(session)
             try:
-                user.hashed_password=get_password_hash(user.hashed_password)
+                if user.hashed_password: user.hashed_password=get_password_hash(user.hashed_password)
                 await user_dal.update_user(user)
             except Exception:
                 raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The input data is not valid")
