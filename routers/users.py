@@ -7,7 +7,7 @@ from models.user import UserRead, UserCreate, UserUpdate
 
 router = APIRouter(
     prefix="/users",
-    # dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)]
+    dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)]
 )
 
 
