@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import Response
+from sqlalchemy.exc import IntegrityError
 from sql.dal.service import ServiceDAL
 from sql.database import async_session
 from models.service import Service, ServiceCreate, ServiceUpdate
@@ -36,8 +37,8 @@ async def create_service(service: ServiceCreate) -> Service:
             new_service = ServiceDAL(session)
             try:
                 return await new_service.create_service(service)
-            except Exception:
-                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The input data is not valid")
+            except IntegrityError as e:
+                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=e.orig.args[0])
 
 
 @router.put("/", dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)], status_code=status.HTTP_204_NO_CONTENT)
@@ -47,8 +48,8 @@ async def update_service(service: ServiceUpdate):
             service_dal = ServiceDAL(session)
             try:     
                 await service_dal.update_service(service)
-            except Exception:
-                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The input data is not valid")
+            except IntegrityError as e:
+                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=e.orig.args[0])
             else:
                 return Response(status_code=status.HTTP_204_NO_CONTENT)
 

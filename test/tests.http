@@ -16,10 +16,10 @@ POST http://localhost:8000/services/
 content-type: application/json
 
 {
-    "name": "Another cool service3",
+    "name": "Another cool service",
     "description": "Yep, again, again, AGAIN",
     "logo": "logo.png",
-    "link": "mySuperAppPPP.com"
+    "link": "mySuperAppP.com"
 }
 
 ###

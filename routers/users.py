@@ -33,7 +33,7 @@ async def create_user(user: UserCreate) -> None:
                 raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The input data is not valid")
 
 
-@router.put("/", status_code=status.HTTP_204_NO_CONTENT, dependencies=get_current_user)
+@router.put("/", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(get_current_user)])
 async def update_user(user: UserUpdate) -> None:
     async with async_session() as session:
         async with session.begin():
