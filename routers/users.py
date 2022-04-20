@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from auth.dependencies import current_user_admin, get_current_user, get_password_hash, oauth2_scheme
-from sql.dal.user import UserDAL
+from dal.user import UserDAL
 from sqlalchemy.exc import IntegrityError
 from sql.database import async_session
 from models.user import UserRead, UserCreate, UserUpdate

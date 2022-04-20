@@ -1,5 +1,3 @@
-import encodings
-from tarfile import ENCODING
 import aioredis
 
 SECRET="0fngsCHvum0opzdWbxnehlMZgTKFydH7"

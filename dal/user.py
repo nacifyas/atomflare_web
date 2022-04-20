@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from sql.sqlmodels import UserDB
+from redis.user import UserCache
 from models.user import User, UserCreate, UserUpdate
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
@@ -18,16 +19,28 @@ class UserDAL:
         query = await self.db_session.execute(select(UserDB).where(UserDB.username == username))
         return normalize(query.scalars().first())
 
+    async def get_by_id(self, id: int) -> User:
+        if (await UserCache.exists(id)):
+            return await UserCache.get(id)
+        else:
+            query = await self.db_session.execute(select(UserDB).where(UserDB.id == id))
+            user = normalize(query.scalars().first())
+            if user:
+                await UserCache.set(user)
+            else:
+                await UserCache.set_null(id)
+            return user
 
     async def get_all_users(self, limit: int, skip: int) -> list[User]:
         query = await self.db_session.execute(select(UserDB).offset(skip).limit(limit))
-        return [normalize(user) for user in query.scalars().all()]
-
+        user_array = [normalize(user) for user in query.scalars().all()]
+        return user_array
 
     async def create_user(self, user: UserCreate) -> User:
         new_user = UserDB(**user.dict())
         self.db_session.add(new_user)
         await self.db_session.flush()
+        await UserCache.set(new_user)
         return new_user
 
     async def update_user(self, user: UserUpdate) -> User:
@@ -41,10 +54,12 @@ class UserDAL:
         query = query.values(is_admin=user.is_admin)
         query.execution_options(synchronize_session="fetch")
         await self.db_session.execute(query)
+        await UserCache.set(user)
         return user
         
     async def delete_user(self, id: int) -> None:
         query = delete(UserDB).where(UserDB.id == id)
         query.execution_options(synchronize_session="fetch")
         await self.db_session.execute(query)
+        await UserCache.delete(id)
         

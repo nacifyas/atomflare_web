@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import Response
 from sqlalchemy.exc import IntegrityError
-from sql.dal.service import ServiceDAL
+from dal.service import ServiceDAL
 from sql.database import async_session
 from models.service import Service, ServiceCreate, ServiceUpdate
 from auth.dependencies import oauth2_scheme, current_user_admin
@@ -30,7 +30,8 @@ async def get_service_by_id(service_id: int) -> Service:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such service")
                 
 
-@router.post('/', response_model=Service, dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)], status_code=status.HTTP_201_CREATED)
+# @router.post('/', response_model=Service, dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)], status_code=status.HTTP_201_CREATED)
+@router.post('/', response_model=Service)#, dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)], status_code=status.HTTP_201_CREATED)
 async def create_service(service: ServiceCreate) -> Service:
     async with async_session() as session:
         async with session.begin():

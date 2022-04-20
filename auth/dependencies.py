@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status, Depends
 from passlib.context import CryptContext
-from sql.dal.user import UserDAL
+from dal.user import UserDAL
 from sql.database import async_session
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt

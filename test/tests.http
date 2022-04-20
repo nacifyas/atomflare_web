@@ -8,7 +8,7 @@ GET http://localhost:8000/services/
 
 ###
 
-GET http://localhost:8000/services/100
+GET http://localhost:8000/services/1
 
 ####################################
 
@@ -16,10 +16,10 @@ POST http://localhost:8000/services/
 content-type: application/json
 
 {
-    "name": "Another cool service",
-    "description": "Yep, again, again, AGAIN",
+    "name": "Service1",
+    "description": "Nice Service",
     "logo": "logo.png",
-    "link": "mySuperAppP.com"
+    "link": "app.io"
 }
 
 ###
