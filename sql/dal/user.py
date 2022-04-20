@@ -30,7 +30,7 @@ class UserDAL:
         await self.db_session.flush()
         return new_user
 
-    async def update_user(self, user: UserUpdate) -> None:
+    async def update_user(self, user: UserUpdate) -> User:
         query = update(UserDB).where(UserDB.id == user.id)
         if user.name:
             query = query.values(name=user.name)

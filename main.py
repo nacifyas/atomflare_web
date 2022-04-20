@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from sql.database import engine, Base
 from routers import services, users, auths
 
 app = FastAPI()
@@ -8,12 +7,12 @@ app.include_router(services.router)
 app.include_router(users.router)
 app.include_router(auths.router)
 
-@app.on_event("startup")
-async def startup():
-    # create db tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+# from sql.database import engine, Base
+# @app.on_event("startup")
+# async def startup():
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.drop_all)
+#         await conn.run_sync(Base.metadata.create_all)
 
 #####################
 import uvicorn

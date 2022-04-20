@@ -28,7 +28,7 @@ class ServiceDAL():
         await self.db_session.flush()
         return new_service
 
-    async def update_service(self, service: ServiceUpdate) -> None:
+    async def update_service(self, service: ServiceUpdate) -> Service:
         query = update(ServiceDB).where(ServiceDB.id == service.id)
         if service.name:
             query = query.values(name=service.name)
@@ -41,11 +41,10 @@ class ServiceDAL():
         query = query.values(is_visible=service.is_visibility)
         query.execution_options(synchronize_session="fetch")
         await self.db_session.execute(query)
+        return service
         
     async def delete_service(self, id: int) -> None:
         query = delete(ServiceDB).where(ServiceDB.id == id)
         query.execution_options(synchronize_session="fetch")
         await self.db_session.execute(query)
-        
-
         
