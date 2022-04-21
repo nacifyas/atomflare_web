@@ -8,7 +8,7 @@ GET http://localhost:8000/services/
 
 ###
 
-GET http://localhost:8000/services/1
+GET http://localhost:8000/services/25
 
 ####################################
 
@@ -16,24 +16,26 @@ POST http://localhost:8000/services/
 content-type: application/json
 
 {
-    "name": "Service1",
+    "name": "Service4",
     "description": "Nice Service",
     "logo": "logo.png",
-    "link": "app.io"
+    "link": "app4.io"
 }
 
 ###
+# ISSUE -> If not all atributes are given, it fails
 
 PUT http://localhost:8000/services/
 content-type: application/json
 
 {
-    "id": 1,
-    # "name": "Service UPDATE c:",
-    # "description": "Super Duper Cool Service",
-    # "logo": "123path123",
-    # "link": "path5",
-    "visibility": "true"
+    "id": 25,
+    "name": "Service UPDATE",
+    "description": "Super Duper Cool Service",
+    "logo": "123path123.ab",
+    "link": "path5.sq",
+    "is_visible": "false",
+    "bla":"foo"
 }
 
 ###

@@ -22,11 +22,13 @@ class ServiceDAL():
 
     async def get_by_id(self, id: int) -> Service:
         if (await ServiceCache.exists(id)):
+            print("!!!!!!!!!!!!CACHE!!!!!!!!!!!!!")
             return await ServiceCache.get(id)
         else:
+            print("!!!!!!!!!!!!NO CACHE!!!!!!!!!!!!!")
             query = await self.db_session.execute(select(ServiceDB).where(ServiceDB.id == id))
             service = normalize(query.scalars().first())
-            if service:
+            if service is not None:
                 await ServiceCache.set(service)
             else: 
                 await ServiceCache.set_null(id)
@@ -36,8 +38,8 @@ class ServiceDAL():
         new_service = ServiceDB(**service.dict())
         self.db_session.add(new_service)
         await self.db_session.flush()
-        await ServiceCache.set(new_service)
-        return new_service
+        await ServiceCache.set(normalize(new_service))
+        return normalize(new_service)
 
     async def update_service(self, service: ServiceUpdate) -> Service:
         query = update(ServiceDB).where(ServiceDB.id == service.id)
@@ -49,9 +51,10 @@ class ServiceDAL():
             query = query.values(logo=service.logo)
         if service.link:
             query = query.values(link=service.link)
-        query = query.values(is_visible=service.is_visibility)
+        query = query.values(is_visible=service.is_visible) # ISSUE -> null visibility get through
         query.execution_options(synchronize_session="fetch")
         await self.db_session.execute(query)
+        await ServiceCache.delete(service.id) # - ISSUE
         await ServiceCache.set(service)
         return service
         
@@ -59,6 +62,5 @@ class ServiceDAL():
         query = delete(ServiceDB).where(ServiceDB.id == id)
         query.execution_options(synchronize_session="fetch")
         await self.db_session.execute(query)
-        await ServiceCache.delete(id)
         await ServiceCache.set_null(id)
         

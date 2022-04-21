@@ -2,6 +2,8 @@ from typing import Optional
 from fastapi import Query
 from pydantic import BaseModel
 
+ATRIBUTES_LIST = ["id", "name", "description", "logo", "link", "is_visible"]
+
 class ServiceBase(BaseModel):
     name: Optional[str] = Query(..., min_length=3, max_length=75)
     description: Optional[str] = Query(..., min_length=3, max_length=140)
@@ -15,6 +17,9 @@ class ServiceCreate(ServiceBase):
 class Service(ServiceBase):
     id: int
 
+    def to_dict(self) -> dict:
+        return dict((key, str(value)) for key, value in self.__dict__.items() if not callable(value) and not key.startswith('__'))
+
     class Config:
         orm_mode = True
 
@@ -26,6 +31,9 @@ class ServiceUpdate(BaseModel):
     logo: str = Query(None, regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
     link: str = Query(None, regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
     is_visible: Optional[bool] = None
+
+    def to_dict(self) -> dict:
+        return dict((key, str(value)) for key, value in self.__dict__.items() if not callable(value) and not key.startswith('__'))
 
     class Config:
         orm_mode = True
