@@ -14,11 +14,9 @@ class ServiceBase(BaseModel):
 class ServiceCreate(ServiceBase):
     pass
 
+
 class Service(ServiceBase):
     id: int
-
-    def to_dict(self) -> dict:
-        return dict((key, str(value)) for key, value in self.__dict__.items() if not callable(value) and not key.startswith('__'))
 
     class Config:
         orm_mode = True
@@ -31,9 +29,6 @@ class ServiceUpdate(BaseModel):
     logo: str = Query(None, regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
     link: str = Query(None, regex="^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
     is_visible: Optional[bool] = None
-
-    def to_dict(self) -> dict:
-        return dict((key, str(value)) for key, value in self.__dict__.items() if not callable(value) and not key.startswith('__'))
 
     class Config:
         orm_mode = True

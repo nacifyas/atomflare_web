@@ -8,7 +8,7 @@ GET http://localhost:8000/services/
 
 ###
 
-GET http://localhost:8000/services/25
+GET http://localhost:8000/services/30
 
 ####################################
 
@@ -29,15 +29,11 @@ PUT http://localhost:8000/services/
 content-type: application/json
 
 {
-    "id": 25,
-    "name": "Service UPDATE",
-    "description": "Super Duper Cool Service",
-    "logo": "123path123.ab",
-    "link": "path5.sq",
-    "is_visible": "false",
-    "bla":"foo"
+    "id": 30,
+    "name": "Updated Servicex2 id30 :)",
+    "foo": "bar"
 }
 
 ###
 
-DELETE http://localhost:8000/services/1
+DELETE http://localhost:8000/services/30
