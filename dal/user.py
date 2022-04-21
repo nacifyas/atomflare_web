@@ -21,14 +21,12 @@ class UserDAL:
     def __init__(self, db_session: Session):
         self.db_session = db_session
 
-    async def get_by_username(self, username: str) -> User:
-        query = await self.db_session.execute(select(UserDB).where(UserDB.username == username))
-        return normalize(query.scalars().first())
-
-
     async def get_all_users(self, limit: int, skip: int) -> list[User]:
         query = await self.db_session.execute(select(UserDB).offset(skip).limit(limit))
-        user_array = [normalize(user) for user in query.scalars().all()]
+        user_array = []
+        for user in query.scalars().all():
+            user_array.append(normalize(user))
+            await UserCache.set(cacheNormalize(normalize(user)))
         return user_array
 
     async def get_by_id(self, id: int) -> User:

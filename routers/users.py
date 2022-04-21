@@ -41,7 +41,9 @@ async def update_user(user: UserUpdate) -> Response:
             user_dal = UserDAL(session)
             try:
                 if user.hashed_password: user.hashed_password=get_password_hash(user.hashed_password)
-                await user_dal.update_user(user)
+                updated_user = await user_dal.update_user(user)
+                if updated_user is None:
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such user")
             except IntegrityError as e:
                 raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=e.orig.args[0])
             else:

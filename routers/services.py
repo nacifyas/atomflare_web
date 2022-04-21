@@ -47,7 +47,9 @@ async def update_service(service: ServiceUpdate):
         async with session.begin():
             service_dal = ServiceDAL(session)
             try:     
-                await service_dal.update_service(service)
+                updated_service = await service_dal.update_service(service)
+                if updated_service is None:
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such service")
             except IntegrityError as e:
                 raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=e.orig.args[0])
             else:

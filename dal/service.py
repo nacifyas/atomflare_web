@@ -23,7 +23,11 @@ class ServiceDAL():
     
     async def get_all_services(self, limit: int, skip: int) -> list[Service]:
         query = await self.db_session.execute(select(ServiceDB).offset(skip).limit(limit))
-        return [normalize(service) for service in query.scalars().all()]
+        service_array = []
+        for service in query.scalars().all():
+            service_array.append(normalize(service))
+            await ServiceCache.set(cacheNormalize(normalize(service)))
+        return service_array
 
     async def get_by_id(self, id: int) -> Service:
         if (await ServiceCache.exists(id)):
