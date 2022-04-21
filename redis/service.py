@@ -16,15 +16,15 @@ class ServiceCache():
 
     async def set(service: dict) -> str:
         id = service["id"]
-        await redis.delete(f"service:{id}")
+        await redis.delete(f"no-service:{id}")
         return await redis.hmset(f"service:{id}", service)
 
     async def exists(id: int) -> int:
         return await redis.exists(f"service:{id}") or await redis.exists(f"no-service:{id}")
 
+    async def delete(id: int) -> int:
+        return await redis.delete(f"service:{id}")
+
     async def set_null(id: int) -> str:
         return await redis.set(f"no-service:{id}","None")
         
-
-    async def delete(id: int) -> int:
-        return await redis.delete(f"service:{id}")

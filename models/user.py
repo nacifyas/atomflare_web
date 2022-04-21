@@ -2,6 +2,8 @@ from typing import Optional
 from fastapi import Query
 from pydantic import BaseModel
 
+ATRIBUTES_LIST = ["id", "username", "name", "is_admin"]
+
 class UserBase(BaseModel):
     username: Optional[str] = Query(..., min_length=3, max_length=25)
     name: Optional[str] = Query(..., min_length=3, max_length=75)

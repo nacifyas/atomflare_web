@@ -14,7 +14,6 @@ class ServiceBase(BaseModel):
 class ServiceCreate(ServiceBase):
     pass
 
-
 class Service(ServiceBase):
     id: int
 
