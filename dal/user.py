@@ -29,6 +29,15 @@ class UserDAL:
             await UserCache.set(cacheNormalize(normalize(user)))
         return user_array
 
+    async def get_by_username(self, username: str) -> User:
+        query = await self.db_session.execute(select(UserDB).where(UserDB.username == username))
+        user = normalize(query.scalars().first())
+        if user is not None:
+            await UserCache.set(cacheNormalize(user))
+        else:
+            await UserCache.set_null(id)
+        return user
+
     async def get_by_id(self, id: int) -> User:
         if (await UserCache.exists(id)):
             return await UserCache.get(id)

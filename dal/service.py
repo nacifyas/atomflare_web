@@ -4,7 +4,7 @@ from redis.service import ServiceCache
 from sql.sqlmodels import ServiceDB
 from models.service import Service, ServiceCreate, ServiceUpdate
 from sqlalchemy import delete, update
-
+import asyncio
 
 def cacheNormalize(service: Service) -> dict:
     service_dict = service.dict()
@@ -76,7 +76,9 @@ class ServiceDAL():
     async def delete_service(self, id: int) -> None:
         query = delete(ServiceDB).where(ServiceDB.id == id)
         query.execution_options(synchronize_session="fetch")
-        await self.db_session.execute(query)
-        await ServiceCache.delete(id)
-        await ServiceCache.set_null(id)
+        await asyncio.gather(
+            self.db_session.execute(query),
+            ServiceCache.delete(id),
+            ServiceCache.set_null(id)
+        )
         

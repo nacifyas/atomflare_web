@@ -1,5 +1,6 @@
 from models.service import Service, ATRIBUTES_LIST
 from redis.config import redis
+import asyncio
 
 def normalize(service_values: list[str]) -> Service:
     service_dict = dict(zip(ATRIBUTES_LIST, service_values))
@@ -16,11 +17,18 @@ class ServiceCache():
 
     async def set(service: dict) -> str:
         id = service["id"]
-        await redis.delete(f"no-service:{id}")
-        return await redis.hmset(f"service:{id}", service)
+        res = await asyncio.gather (
+            redis.delete(f"no-service:{id}"),
+            redis.hmset(f"service:{id}", service)
+        )
+        return res.__str__
 
     async def exists(id: int) -> int:
-        return await redis.exists(f"service:{id}") or await redis.exists(f"no-service:{id}")
+        ex, nx = await asyncio.gather(
+            redis.exists(f"service:{id}"),
+            redis.exists(f"no-service:{id}")
+        )
+        return int(ex) + int(nx) >= 1
 
     async def delete(id: int) -> int:
         return await redis.delete(f"service:{id}")
