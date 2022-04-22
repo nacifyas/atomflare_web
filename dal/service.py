@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Union
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
 from redis.service import ServiceCache
@@ -7,7 +7,7 @@ from models.service import Service, ServiceCreate, ServiceUpdate
 from sqlalchemy import delete, update
 import asyncio
 
-def cacheNormalize(service: Optional[Service]) -> dict:
+def cacheNormalize(service: Union[Service, ServiceDB]) -> dict:
     service_dict = service.dict() if isinstance(service, Service) else service.__dict__
     service_dict["is_visible"] = str(service.is_visible)
     return service_dict
@@ -24,7 +24,8 @@ class ServiceDAL():
     
     async def get_all_services(self, limit: int, skip: int) -> list[Service]:
         query = await self.db_session.execute(select(ServiceDB).offset(skip).limit(limit))
-        service_array, coro_arr = []
+        coro_arr = []
+        service_array = []
         for service in query.scalars().all():
             service_array.append(normalize(service))
             coro_arr.append(
@@ -34,12 +35,12 @@ class ServiceDAL():
         return service_array
 
     async def get_by_id(self, id: int) -> Service:
-        cor_arr = await asyncio.gather(
+        service_exists, service_retrieval = await asyncio.gather(
             ServiceCache.exists(id),
             ServiceCache.get(id)
         )
-        if (cor_arr[0]):
-            return cor_arr[1]
+        if (service_exists):
+            return service_retrieval
         else:
             query = await self.db_session.execute(select(ServiceDB).where(ServiceDB.id == id))
             service = normalize(query.scalars().first())

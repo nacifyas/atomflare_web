@@ -11,8 +11,11 @@ def normalize(service_values: list[str]) -> Service:
 class ServiceCache():
 
     async def get(id: int) -> Service:
-        service = await redis.get(f"no-service:{id}")
-        service = None if service == 'None' else normalize(await redis.hmget(f"service:{id}", ATRIBUTES_LIST))
+        null_service, id_service = await asyncio.gather(
+            redis.get(f"no-service:{id}"),
+            redis.hmget(f"service:{id}")
+        )
+        service = None if null_service == 'None' else normalize(id_service)
         return service
 
     async def set(service: dict) -> str:

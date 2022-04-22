@@ -1,5 +1,6 @@
 from models.user import UserRead, ATRIBUTES_LIST
 from redis.config import redis
+import asyncio
 
 def normalize(user_values: list[str]) -> UserRead:
     user_dict = dict(zip(ATRIBUTES_LIST, user_values))
@@ -10,15 +11,27 @@ def normalize(user_values: list[str]) -> UserRead:
 class UserCache():
     
     async def get(id: int) -> UserRead:
-        return await redis.hmget(f"user:{id}", ATRIBUTES_LIST)
+        null_user, id_user = await asyncio.gather(
+            redis.get(f"no-user:{id}"),
+            redis.hmget(f"user:{id}")
+        )
+        user = None if null_user == 'None' else normalize(id_user)
+        return user
 
     async def set(user: dict) -> str:
         id = user["id"]
-        await redis.delete(f"no-user:{id}")
-        return await redis.hmset(f"user:{id}", user)
+        res = await asyncio.gather (
+            redis.delete(f"no-user:{id}"),
+            redis.hmset(f"user:{id}", user)
+        )
+        return res.__str__
 
-    async def exists(id: int) -> bool:
-        return await redis.hexists(f"user:{id}") or await redis.exists(f"no-user:{id}")
+    async def exists(id: int) -> int:
+        ex, nx = await asyncio.gather(
+            redis.exists(f"user:{id}"),
+            redis.exists(f"no-user:{id}")
+        )
+        return int(ex) + int(nx) >= 1
 
     async def delete(id: int) -> int:
         return await redis.delete(f"user:{id}")

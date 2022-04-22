@@ -1,12 +1,14 @@
+from typing import Union
 from sqlalchemy.orm import Session
 from sql.sqlmodels import UserDB
 from redis.user import UserCache
 from models.user import User, UserCreate, UserUpdate
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
+import asyncio
 
-def cacheNormalize(user: User) -> dict:
-    user_dict = user.dict()
+def cacheNormalize(user: Union[User, UserDB]) -> dict:
+    user_dict = user.dict() if isinstance(user, User) else user.__dict__
     user_dict["is_admin"] = str(user.is_admin)
     user_dict.pop("hashed_password")
     return user_dict
@@ -23,10 +25,13 @@ class UserDAL:
 
     async def get_all_users(self, limit: int, skip: int) -> list[User]:
         query = await self.db_session.execute(select(UserDB).offset(skip).limit(limit))
-        user_array = []
+        user_array, coro_arr = []
         for user in query.scalars().all():
             user_array.append(normalize(user))
-            await UserCache.set(cacheNormalize(normalize(user)))
+            coro_arr.append(
+                UserCache.set(cacheNormalize(user))
+            )
+        await asyncio.gather(*coro_arr)
         return user_array
 
     async def get_by_username(self, username: str) -> User:
@@ -39,8 +44,12 @@ class UserDAL:
         return user
 
     async def get_by_id(self, id: int) -> User:
-        if (await UserCache.exists(id)):
-            return await UserCache.get(id)
+        user_exists, user_retrieval = await asyncio.gather(
+            UserCache.exists(id),
+            UserCache.get(id)
+        )
+        if user_exists:
+            return user_retrieval
         else:
             query = await self.db_session.execute(select(UserDB).where(UserDB.id == id))
             user = normalize(query.scalars().first())
@@ -81,7 +90,9 @@ class UserDAL:
     async def delete_user(self, id: int) -> None:
         query = delete(UserDB).where(UserDB.id == id)
         query.execution_options(synchronize_session="fetch")
-        await self.db_session.execute(query)
-        await UserCache.delete(id)
-        await UserCache.set_null(id)
+        await asyncio.gather(
+            self.db_session.execute(query),
+            UserCache.delete(id),
+            UserCache.set_null(id)
+        )
         
