@@ -24,7 +24,7 @@ async def get_service_by_id(service_id: int) -> Service:
         async with session.begin():
             service_dal = ServiceDAL(session)
             ret = await service_dal.get_by_id(service_id)
-            if ret:
+            if ret is not None:
                 return ret
             else:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such service")

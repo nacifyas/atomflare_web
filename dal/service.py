@@ -1,6 +1,7 @@
 from typing import Union
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
+from yaml import serialize
 from redis.service import ServiceCache
 from sql.sqlmodels import ServiceDB
 from models.service import Service, ServiceCreate, ServiceUpdate
@@ -8,7 +9,7 @@ from sqlalchemy import delete, update
 import asyncio
 
 def cacheNormalize(service: Union[Service, ServiceDB]) -> dict:
-    service_dict = service.dict() if isinstance(service, Service) else service.__dict__
+    service_dict = service.dict() if isinstance(service, Service) else Service(**service.__dict__).dict()
     service_dict["is_visible"] = str(service.is_visible)
     return service_dict
 
@@ -58,25 +59,29 @@ class ServiceDAL():
         return normalize(new_service)
 
     async def update_service(self, service: ServiceUpdate) -> Service:
-        exists = await self.db_session.execute(select(ServiceDB.id).where(ServiceDB.id == service.id))
-        exists = exists.scalars().first() is not None
-        if exists:
+        old_service = await self.get_by_id(service.id)
+        if old_service is not None:
+            service_updated = normalize(old_service)
             query = update(ServiceDB).where(ServiceDB.id == service.id)
             if service.name:
                 query = query.values(name=service.name)
+                service_updated.name = service.name
             if service.description:
                 query = query.values(description=service.description)
+                service_updated.description = service.description
             if service.logo:
                 query = query.values(logo=service.logo)
+                service_updated.logo = service.logo
             if service.link:
                 query = query.values(link=service.link)
+                service_updated.link = service.link
             if service.is_visible is not None:
                 query = query.values(is_visible=service.is_visible)
+                service_updated.is_visible = service.is_visible
             query.execution_options(synchronize_session="fetch")
             await self.db_session.execute(query)
-            update_service = normalize(await self.db_session.get(ServiceDB, service.id))
-            await ServiceCache.set(cacheNormalize(update_service))
-            return update_service
+            await ServiceCache.set(cacheNormalize(service_updated)) 
+            return service_updated
         else:
             await ServiceCache.set_null(service.id)
             return None

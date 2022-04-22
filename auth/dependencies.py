@@ -4,7 +4,6 @@ from dal.user import UserDAL
 from sql.database import async_session
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-import asyncio
 
 from auth.tokens import ALGORITHM, SECRET_KEY, TokenData
 from models.user import User
@@ -44,18 +43,15 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def verify_password(plain_password, hashed_password):
+def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
 async def authenticate_user(username: str, password: str):
-    user, verify_password = await asyncio.gather(
-        get_user(username),
-        verify_password(password, user.hashed_password)
-    )
+    user = await get_user(username)
     if not user:
         return False
-    if not verify_password:
+    if not verify_password(password, user.hashed_password):
         return False
     return user
 
