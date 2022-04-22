@@ -1,7 +1,6 @@
 from typing import Union
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
-from yaml import serialize
 from redis.service import ServiceCache
 from sql.sqlmodels import ServiceDB
 from models.service import Service, ServiceCreate, ServiceUpdate
