@@ -1,3 +1,4 @@
+[![Tests](https://github.com/nacifyas/atomflare_web/actions/workflows/test.yaml/badge.svg)](https://github.com/nacifyas/atomflare_web/actions/workflows/test.yaml)
 # Atomflare Web
 
 This poject contains the backend for a webapp, that stores services & users. The intentio behind this project is to keep track of my internet projects under the domain Atomflare.tk
