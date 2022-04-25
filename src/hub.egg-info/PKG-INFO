@@ -1,0 +1,26 @@
+Metadata-Version: 2.1
+Name: hub
+Version: 0.0.1
+Summary: Atomflare hub edition
+Home-page: https://github.com/nacifyas/atomflare_web
+Author: Yassine Nacif
+Author-email: nacifyas@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/nacifyas/atomflare_web/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENCE
+
+# Atomflare Web
+
+This poject contains the backend for a webapp, that stores services & users. The intentio behind this project is to keep track of my internet projects under the domain Atomflare.tk
+
+In order to test this project, a test db by postgres is requiered.
+You do not neet to create the specific tables, just change the url at database.py according to your needs, and uncomment the code at main.py, and you will be ready to go.
+
+Run the file main.py and go to 127.0.0.1:8000/docs and you will be prompted with the API documentation.
+

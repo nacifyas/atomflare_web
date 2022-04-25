@@ -1,6 +1,5 @@
-from www.dal.service import ServiceDAL 
+import hub
 
-serviceDAL = ServiceDAL()
-res = serviceDAL.get_all_services()
-
-print(res)
+def test_one():
+    print("Success")
+    assert True
