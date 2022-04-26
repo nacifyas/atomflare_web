@@ -7,4 +7,9 @@ ENV/
 env.bak/
 venv.bak/
 *cache*
-.tox
+/.tox
+/.*_cache
+*.pyc
+*.pyo
+*.swp
+__pycache__
