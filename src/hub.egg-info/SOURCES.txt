@@ -1,4 +1,5 @@
 LICENCE
+README.md
 pyproject.toml
 setup.cfg
 src/hub/__init__.py
