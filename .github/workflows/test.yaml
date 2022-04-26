@@ -24,4 +24,4 @@ jobs:
         python -m pip install -r requirements_dev.txt
         python -m pip install tox tox-gh-actions
     - name: Tests with tox
-      run: tox
+      run: tox -e py
