@@ -1,5 +1,6 @@
 from typing import Union
 from sqlalchemy.orm import Session
+from hub.sql.database import async_session
 from sqlalchemy.future import select
 from hub.redis.service import ServiceCache
 from hub.sql.sqlmodels import ServiceDB
@@ -22,6 +23,11 @@ class ServiceDAL():
     def __init__(self, db_session: Session):
         self.db_session = db_session
     
+    async def begin():
+        async with async_session() as session:
+            async with session.begin():
+                return ServiceDAL(session)
+
     async def get_all_services(self, limit: int, skip: int) -> list[Service]:
         query = await self.db_session.execute(select(ServiceDB).offset(skip).limit(limit))
         coro_arr = []

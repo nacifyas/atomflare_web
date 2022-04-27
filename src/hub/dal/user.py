@@ -2,6 +2,7 @@ from typing import Union
 from sqlalchemy.orm import Session
 from hub.sql.sqlmodels import UserDB
 from hub.redis.user import UserCache
+from hub.sql.database import async_session
 from hub.models.user import User, UserCreate, UserUpdate
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
@@ -22,6 +23,11 @@ def normalize(user: UserDB) -> User:
 class UserDAL:
     def __init__(self, db_session: Session):
         self.db_session = db_session
+
+    async def begin():
+        async with async_session() as session:
+            async with session.begin():
+                return UserDAL(session)
 
     async def get_all_users(self, limit: int, skip: int) -> list[User]:
         query = await self.db_session.execute(select(UserDB).offset(skip).limit(limit))
