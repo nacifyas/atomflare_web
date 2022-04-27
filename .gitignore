@@ -13,3 +13,4 @@ venv.bak/
 *.swp
 __pycache__
 .tox
+*.http
