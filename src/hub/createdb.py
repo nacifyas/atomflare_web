@@ -1,4 +1,4 @@
-from sql.database import engine, Base
+from hub.sql.database import engine, Base
 import asyncio
 
 async def createdb():

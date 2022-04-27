@@ -1,9 +1,9 @@
 from typing import Union
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
-from redis.service import ServiceCache
-from sql.sqlmodels import ServiceDB
-from models.service import Service, ServiceCreate, ServiceUpdate
+from hub.redis.service import ServiceCache
+from hub.sql.sqlmodels import ServiceDB
+from hub.models.service import Service, ServiceCreate, ServiceUpdate
 from sqlalchemy import delete, update
 import asyncio
 

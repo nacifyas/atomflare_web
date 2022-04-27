@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import Response
 from sqlalchemy.exc import IntegrityError
-from dal.service import ServiceDAL
-from sql.database import async_session
-from models.service import Service, ServiceCreate, ServiceUpdate
-from auth.dependencies import oauth2_scheme, current_user_admin
+from hub.dal.service import ServiceDAL
+from hub.sql.database import async_session
+from hub.models.service import Service, ServiceCreate, ServiceUpdate
+from hub.auth.dependencies import oauth2_scheme, current_user_admin
 
 router = APIRouter(
     prefix = "/services"

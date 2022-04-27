@@ -1,8 +1,8 @@
 from datetime import timedelta
-from auth.tokens import ACCESS_TOKEN_EXPIRE_MINUTES, Token, create_access_token
+from hub.auth.tokens import ACCESS_TOKEN_EXPIRE_MINUTES, Token, create_access_token
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from auth.dependencies import authenticate_user
+from hub.auth.dependencies import authenticate_user
 
 router = APIRouter(
     prefix="/token"

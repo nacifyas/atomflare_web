@@ -1,8 +1,8 @@
 from typing import Union
 from sqlalchemy.orm import Session
-from sql.sqlmodels import UserDB
-from redis.user import UserCache
-from models.user import User, UserCreate, UserUpdate
+from hub.sql.sqlmodels import UserDB
+from hub.redis.user import UserCache
+from hub.models.user import User, UserCreate, UserUpdate
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
 import asyncio

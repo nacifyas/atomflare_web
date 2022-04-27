@@ -1,12 +1,12 @@
 from fastapi import HTTPException, status, Depends
 from passlib.context import CryptContext
-from dal.user import UserDAL
-from sql.database import async_session
+from hub.dal.user import UserDAL
+from hub.sql.database import async_session
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
-from auth.tokens import ALGORITHM, SECRET_KEY, TokenData
-from models.user import User
+from hub.auth.tokens import ALGORITHM, SECRET_KEY, TokenData
+from hub.models.user import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

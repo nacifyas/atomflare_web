@@ -9,6 +9,9 @@ src/hub.egg-info/PKG-INFO
 src/hub.egg-info/SOURCES.txt
 src/hub.egg-info/dependency_links.txt
 src/hub.egg-info/top_level.txt
+src/hub/dal/__init__.py
+src/hub/dal/service.py
+src/hub/dal/user.py
 src/hub/models/__init__.py
 src/hub/models/service.py
 src/hub/models/user.py

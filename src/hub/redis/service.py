@@ -1,5 +1,5 @@
-from models.service import Service, ATRIBUTES_LIST
-from redis.config import redis
+from hub.models.service import Service, ATRIBUTES_LIST
+from hub.redis.config import redis
 import asyncio
 
 def normalize(service_values: list[str]) -> Service:

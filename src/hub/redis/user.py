@@ -1,5 +1,5 @@
-from models.user import UserRead, ATRIBUTES_LIST
-from redis.config import redis
+from hub.models.user import UserRead, ATRIBUTES_LIST
+from hub.redis.config import redis
 import asyncio
 
 def normalize(user_values: list[str]) -> UserRead:
