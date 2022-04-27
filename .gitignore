@@ -12,5 +12,4 @@ venv.bak/
 *.pyo
 *.swp
 __pycache__
-.tox
 *.http
