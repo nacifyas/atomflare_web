@@ -26,6 +26,6 @@ jobs:
     - name: Tests with pytest
       run: pytest tests
     - name: Tests with flake8
-      run: flake8 src --max-line-length=110
+      run: flake8 src --max-line-length=146
     - name: Tests with mypy
       run: mypy src
