@@ -1,4 +1,3 @@
-from hub.dal.service import ServiceDAL
 import pytest
 
 
