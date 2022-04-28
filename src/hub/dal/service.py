@@ -1,6 +1,5 @@
 from typing import Optional, Union
 from sqlalchemy.orm import Session
-from hub.sql.database import async_session
 from sqlalchemy.future import select
 from hub.redis.service import ServiceCache
 from hub.sql.sqlmodels import ServiceDB
@@ -97,9 +96,3 @@ class ServiceDAL():
             ServiceCache().delete(id),
             ServiceCache().set_null(id)
         )
-
-
-async def begin() -> ServiceDAL:
-    async with async_session() as session:
-        async with session.begin():
-            return ServiceDAL(session)

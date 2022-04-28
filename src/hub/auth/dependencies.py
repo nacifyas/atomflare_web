@@ -1,19 +1,18 @@
 from typing import Optional
 from fastapi import HTTPException, status, Depends
 from passlib.context import CryptContext
-from hub.dal.user import begin
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-
 from hub.auth.tokens import ALGORITHM, SECRET_KEY, TokenData
+from hub.dal.dependencies import get_user_dal
+from hub.dal.user import UserDAL
 from hub.models.user import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-async def get_user(username: str) -> Optional[User]:
-    user_dal = await begin()
+async def get_user(username: str, user_dal: UserDAL = Depends(get_user_dal)) -> Optional[User]:
     return await user_dal.get_by_username(username)
 
 

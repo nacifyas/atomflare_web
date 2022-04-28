@@ -100,9 +100,3 @@ class UserDAL:
             UserCache().delete(id),
             UserCache().set_null(id)
         )
-
-
-async def begin() -> UserDAL:
-    async with async_session() as session:
-        async with session.begin():
-            return UserDAL(session)
