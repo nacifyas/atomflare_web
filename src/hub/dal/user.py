@@ -8,17 +8,20 @@ from sqlalchemy.future import select
 from sqlalchemy import delete, update
 import asyncio
 
+
 def cacheNormalize(user: Union[User, UserDB]) -> dict:
     user_dict = user.dict() if isinstance(user, User) else User(**user.__dict__).dict()
     user_dict["is_admin"] = str(user.is_admin)
     user_dict.pop("hashed_password")
     return user_dict
 
+
 def normalize(user: UserDB) -> User:
     if user:
         return User(**user.__dict__)
     else:
-        return None    
+        return None
+
 
 class UserDAL:
     def __init__(self, db_session: Session):
@@ -86,7 +89,7 @@ class UserDAL:
             if user.hashed_password:
                 query = query.values(hashed_password=user.hashed_password)
                 user_updated.hashed_password = user.hashed_password
-            if user.is_admin is not None:    
+            if user.is_admin is not None:
                 query = query.values(is_admin=user.is_admin)
                 user_updated.is_admin = user.is_admin
             query.execution_options(synchronize_session="fetch")
@@ -96,7 +99,7 @@ class UserDAL:
         else:
             await UserCache.set_null(user.id)
             return None
-        
+
     async def delete_user(self, id: int) -> None:
         query = delete(UserDB).where(UserDB.id == id)
         query.execution_options(synchronize_session="fetch")
@@ -105,4 +108,3 @@ class UserDAL:
             UserCache.delete(id),
             UserCache.set_null(id)
         )
-        

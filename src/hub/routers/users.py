@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from hub.auth.dependencies import current_user_admin, get_current_user, get_password_hash, oauth2_scheme
+from hub.auth.dependencies import current_user_admin
+from hub.auth.dependencies import get_current_user
+from hub.auth.dependencies import get_password_hash
+from hub.auth.dependencies import oauth2_scheme
 from hub.dal.user import UserDAL
 from sqlalchemy.exc import IntegrityError
-from hub.sql.database import async_session
 from hub.models.user import UserRead, UserCreate, UserUpdate
 
 
@@ -22,23 +24,38 @@ async def get_users(limit: int = 20, skip: int = 0) -> list[UserRead]:
 async def create_user(user: UserCreate) -> Response:
     user_dal = await UserDAL.begin()
     try:
-        user.hashed_password=get_password_hash(user.hashed_password)
+        user.hashed_password = get_password_hash(user.hashed_password)
         await user_dal.create_user(user)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except IntegrityError as e:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=e.orig.args[0])
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail=e.orig.args[0]
+            )
 
 
-@router.put("/", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(get_current_user)])
+@router.put(
+    "/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(get_current_user)]
+    )
 async def update_user(user: UserUpdate) -> Response:
     user_dal = await UserDAL.begin()
     try:
-        if user.hashed_password is not None: user.hashed_password = get_password_hash(user.hashed_password)
+        if user.hashed_password is not None:
+            user.hashed_password = get_password_hash(user.hashed_password)
         updated_user = await user_dal.update_user(user)
     except IntegrityError as e:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=e.orig.args[0])
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail=e.orig.args[0]
+            )
     else:
-        if updated_user is None: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such user")
+        if updated_user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No such user"
+                )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -47,5 +64,3 @@ async def delete_user(user_id: int) -> Response:
     user_dal = await UserDAL.begin()
     await user_dal.delete_user(user_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-        

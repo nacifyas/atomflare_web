@@ -2,8 +2,9 @@ from hub.models.user import UserRead, ATRIBUTES_LIST
 from hub.redis.config import redis
 import asyncio
 
+
 def normalize(user_values: list[str]) -> UserRead:
-    if user_values==[None]*len(user_values):
+    if user_values == [None]*len(user_values):
         return None
     else:
         user_dict = dict(zip(ATRIBUTES_LIST, user_values))
@@ -11,8 +12,8 @@ def normalize(user_values: list[str]) -> UserRead:
         user_dict["is_admin"] = bool(user_dict["is_admin"])
         return UserRead(**user_dict)
 
+
 class UserCache():
-    
     async def get(id: int) -> UserRead:
         null_user, id_user = await asyncio.gather(
             redis.get(f"no-user:{id}"),
@@ -23,7 +24,7 @@ class UserCache():
 
     async def set(user: dict) -> str:
         id = user["id"]
-        res = await asyncio.gather (
+        res = await asyncio.gather(
             redis.delete(f"no-user:{id}"),
             redis.hmset(f"user:{id}", user)
         )

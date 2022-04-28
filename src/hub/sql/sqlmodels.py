@@ -3,6 +3,7 @@ from .database import Base
 
 metadata = Base.metadata
 
+
 class ServiceDB(Base):
     __tablename__ = 'services'
 
@@ -12,6 +13,7 @@ class ServiceDB(Base):
     logo = Column(String, nullable=False)
     link = Column(String, nullable=False, unique=True)
     is_visible = Column(Boolean, nullable=False, default=True)
+
 
 class UserDB(Base):
     __tablename__ = 'users'

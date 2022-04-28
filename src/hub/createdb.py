@@ -1,5 +1,6 @@
-from hub.sql.database import engine, Base
 import asyncio
+from hub.sql.database import engine, Base
+
 
 async def createdb():
     async with engine.begin() as conn:

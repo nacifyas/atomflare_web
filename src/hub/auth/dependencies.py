@@ -58,5 +58,9 @@ async def authenticate_user(username: str, password: str):
 
 async def current_user_admin(current_user: User = Depends(get_current_user)):
     if not current_user.is_admin:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Not allowed')
-    else: return current_user
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Not allowed'
+            )
+    else:
+        return current_user

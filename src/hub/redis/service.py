@@ -2,8 +2,9 @@ from hub.models.service import Service, ATRIBUTES_LIST
 from hub.redis.config import redis
 import asyncio
 
+
 def normalize(service_values: list[str]) -> Service:
-    if service_values==[None]*len(service_values):
+    if service_values == [None]*len(service_values):
         return None
     else:
         service_dict = dict(zip(ATRIBUTES_LIST, service_values))
@@ -11,8 +12,8 @@ def normalize(service_values: list[str]) -> Service:
         service_dict["is_visible"] = bool(service_dict["is_visible"])
         return Service(**service_dict)
 
-class ServiceCache():
 
+class ServiceCache():
     async def get(id: int) -> Service:
         null_service, list_service = await asyncio.gather(
             redis.get(f"no-service:{id}"),
@@ -23,7 +24,7 @@ class ServiceCache():
 
     async def set(service: dict) -> str:
         id = service["id"]
-        res = await asyncio.gather (
+        res = await asyncio.gather(
             redis.delete(f"no-service:{id}"),
             redis.hmset(f"service:{id}", service)
         )
@@ -40,5 +41,4 @@ class ServiceCache():
         return await redis.delete(f"service:{id}")
 
     async def set_null(id: int) -> str:
-        return await redis.set(f"no-service:{id}","None")
-        
+        return await redis.set(f"no-service:{id}", "None")

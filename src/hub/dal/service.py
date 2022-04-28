@@ -8,10 +8,12 @@ from hub.models.service import Service, ServiceCreate, ServiceUpdate
 from sqlalchemy import delete, update
 import asyncio
 
+
 def cacheNormalize(service: Union[Service, ServiceDB]) -> dict:
     service_dict = service.dict() if isinstance(service, Service) else Service(**service.__dict__).dict()
     service_dict["is_visible"] = str(service.is_visible)
     return service_dict
+
 
 def normalize(service: ServiceDB) -> Service:
     if service is not None:
@@ -19,10 +21,11 @@ def normalize(service: ServiceDB) -> Service:
     else:
         return None
 
+
 class ServiceDAL():
     def __init__(self, db_session: Session):
         self.db_session = db_session
-    
+
     async def begin():
         async with async_session() as session:
             async with session.begin():
@@ -52,7 +55,7 @@ class ServiceDAL():
             service = normalize(query.scalars().first())
             if service is not None:
                 await ServiceCache.set(cacheNormalize(service))
-            else: 
+            else:
                 await ServiceCache.set_null(id)
             return service
 
@@ -85,12 +88,12 @@ class ServiceDAL():
                 service_updated.is_visible = service.is_visible
             query.execution_options(synchronize_session="fetch")
             await self.db_session.execute(query)
-            await ServiceCache.set(cacheNormalize(service_updated)) 
+            await ServiceCache.set(cacheNormalize(service_updated))
             return service_updated
         else:
             await ServiceCache.set_null(service.id)
             return None
-        
+
     async def delete_service(self, id: int) -> None:
         query = delete(ServiceDB).where(ServiceDB.id == id)
         query.execution_options(synchronize_session="fetch")
@@ -99,4 +102,3 @@ class ServiceDAL():
             ServiceCache.delete(id),
             ServiceCache.set_null(id)
         )
-        
