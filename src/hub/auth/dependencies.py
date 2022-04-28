@@ -47,9 +47,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 async def authenticate_user(username: str, password: str) -> Optional[User]:
     user = await get_user(username)
     if user is not None and verify_password(password, user.hashed_password):
-        return None
-    else:
         return user
+    else:
+        return None
 
 
 async def current_user_admin(current_user: User = Depends(get_current_user)) -> User:
