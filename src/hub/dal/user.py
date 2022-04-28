@@ -40,7 +40,7 @@ class UserDAL:
         for user in query.scalars().all():
             user_array.append(normalize(user))
             coro_arr.append(
-                UserCache.set(cacheNormalize(user))
+                UserCache().set(cacheNormalize(user))
             )
         await asyncio.gather(*coro_arr)
         return user_array
@@ -49,13 +49,13 @@ class UserDAL:
         query = await self.db_session.execute(select(UserDB).where(UserDB.username == username))
         user = normalize(query.scalars().first())
         if user is not None:
-            await UserCache.set(cacheNormalize(user))
+            await UserCache().set(cacheNormalize(user))
         return user
 
     async def get_by_id(self, id: int) -> Optional[User]:
         user_exists, user_retrieval = await asyncio.gather(
-            UserCache.exists(id),
-            UserCache.get(id)
+            UserCache().exists(id),
+            UserCache().get(id)
         )
         if user_exists:
             return user_retrieval
@@ -63,16 +63,16 @@ class UserDAL:
             query = await self.db_session.execute(select(UserDB).where(UserDB.id == id))
             user = normalize(query.scalars().first())
             if user is not None:
-                await UserCache.set(cacheNormalize(user))
+                await UserCache().set(cacheNormalize(user))
             else:
-                await UserCache.set_null(id)
+                await UserCache().set_null(id)
             return user
 
     async def create_user(self, user: UserCreate) -> Optional[User]:
         new_user = UserDB(**user.dict())
         self.db_session.add(new_user)
         await self.db_session.flush()
-        await UserCache.set(cacheNormalize(new_user))
+        await UserCache().set(cacheNormalize(new_user))
         new_user_norm = normalize(new_user)
         return new_user_norm
 
@@ -94,10 +94,10 @@ class UserDAL:
                 old_user.is_admin = user.is_admin
             query.execution_options(synchronize_session="fetch")
             await self.db_session.execute(query)
-            await UserCache.set(cacheNormalize(old_user))
+            await UserCache().set(cacheNormalize(old_user))
             return old_user
         else:
-            await UserCache.set_null(user.id)
+            await UserCache().set_null(user.id)
             return None
 
     async def delete_user(self, id: int) -> None:
@@ -105,6 +105,6 @@ class UserDAL:
         query.execution_options(synchronize_session="fetch")
         await asyncio.gather(
             self.db_session.execute(query),
-            UserCache.delete(id),
-            UserCache.set_null(id)
+            UserCache().delete(id),
+            UserCache().set_null(id)
         )

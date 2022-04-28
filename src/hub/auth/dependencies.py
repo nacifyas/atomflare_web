@@ -13,7 +13,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def get_user(username: str) -> Optional[User]:
-    user_dal = begin()
+    user_dal = await begin()
     return await user_dal.get_by_username(username)
 
 

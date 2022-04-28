@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 from sqlalchemy.orm import Session
 from hub.sql.database import async_session
 from sqlalchemy.future import select
@@ -39,15 +39,15 @@ class ServiceDAL():
         for service in query.scalars().all():
             service_array.append(normalize(service))
             coro_arr.append(
-                ServiceCache.set(cacheNormalize(service))
+                ServiceCache().set(cacheNormalize(service))
             )
         await asyncio.gather(*coro_arr)
         return service_array
 
-    async def get_by_id(self, id: int) -> Service:
+    async def get_by_id(self, id: int) -> Optional[Service]:
         service_exists, service_retrieval = await asyncio.gather(
-            ServiceCache.exists(id),
-            ServiceCache.get(id)
+            ServiceCache().exists(id),
+            ServiceCache().get(id)
         )
         if (service_exists):
             return service_retrieval
@@ -55,20 +55,21 @@ class ServiceDAL():
             query = await self.db_session.execute(select(ServiceDB).where(ServiceDB.id == id))
             service = normalize(query.scalars().first())
             if service is not None:
-                await ServiceCache.set(cacheNormalize(service))
+                await ServiceCache().set(cacheNormalize(service))
             else:
-                await ServiceCache.set_null(id)
+                await ServiceCache().set_null(id)
             return service
 
     async def create_service(self, service: ServiceCreate) -> Service:
         new_service = ServiceDB(**service.dict())
         self.db_session.add(new_service)
         await self.db_session.flush()
-        await ServiceCache.set(cacheNormalize(new_service))
+        await ServiceCache().set(cacheNormalize(new_service))
         return normalize(new_service)
 
-    async def update_service(self, service: ServiceUpdate) -> Service:
+    async def update_service(self, service: ServiceUpdate) -> Optional[Service]:
         old_service = await self.get_by_id(service.id)
+        service_cache = ServiceCache()
         if old_service is not None:
             query = update(ServiceDB).where(ServiceDB.id == service.id)
             if service.name:
@@ -88,10 +89,10 @@ class ServiceDAL():
                 old_service.is_visible = service.is_visible
             query.execution_options(synchronize_session="fetch")
             await self.db_session.execute(query)
-            await ServiceCache.set(cacheNormalize(old_service))
+            await service_cache.set(cacheNormalize(old_service))
             return old_service
         else:
-            await ServiceCache.set_null(service.id)
+            await service_cache.set_null(service.id)
             return None
 
     async def delete_service(self, id: int) -> None:
@@ -99,6 +100,6 @@ class ServiceDAL():
         query.execution_options(synchronize_session="fetch")
         await asyncio.gather(
             self.db_session.execute(query),
-            ServiceCache.delete(id),
-            ServiceCache.set_null(id)
+            ServiceCache().delete(id),
+            ServiceCache().set_null(id)
         )

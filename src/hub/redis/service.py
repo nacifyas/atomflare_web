@@ -15,35 +15,32 @@ def normalize(service_values: list[str]) -> Optional[Service]:
         return Service(**service_dict)
 
 
-async def get(id: int) -> Optional[Service]:
-    null_service, list_service = await asyncio.gather(
-        redis.get(f"no-service:{id}"),
-        redis.hmget(f"service:{id}", ATRIBUTES_LIST)
-    )
-    service = None if null_service == 'None' else normalize(list_service)
-    return service
+class ServiceCache:
+    async def get(self, id: int) -> Optional[Service]:
+        null_service, list_service = await asyncio.gather(
+            redis.get(f"no-service:{id}"),
+            redis.hmget(f"service:{id}", ATRIBUTES_LIST)
+        )
+        service = None if null_service == 'None' else normalize(list_service)
+        return service
 
+    async def set(self, service: dict) -> str:
+        id = service["id"]
+        res = await asyncio.gather(
+            redis.delete(f"no-service:{id}"),
+            redis.hmset(f"service:{id}", service)
+        )
+        return res.__str__
 
-async def set(service: dict) -> str:
-    id = service["id"]
-    res = await asyncio.gather(
-        redis.delete(f"no-service:{id}"),
-        redis.hmset(f"service:{id}", service)
-    )
-    return res.__str__
+    async def exists(self, id: int) -> int:
+        ex, nx = await asyncio.gather(
+            redis.exists(f"service:{id}"),
+            redis.exists(f"no-service:{id}")
+        )
+        return int(ex) + int(nx) >= 1
 
+    async def delete(self, id: int) -> int:
+        return await redis.delete(f"service:{id}")
 
-async def exists(id: int) -> int:
-    ex, nx = await asyncio.gather(
-        redis.exists(f"service:{id}"),
-        redis.exists(f"no-service:{id}")
-    )
-    return int(ex) + int(nx) >= 1
-
-
-async def delete(id: int) -> int:
-    return await redis.delete(f"service:{id}")
-
-
-async def set_null(id: int) -> str:
-    return await redis.set(f"no-service:{id}", "None")
+    async def set_null(self, id: int) -> str:
+        return await redis.set(f"no-service:{id}", "None")
