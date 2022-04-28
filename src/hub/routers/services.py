@@ -59,7 +59,7 @@ async def create_service(service: ServiceCreate) -> Service:
     dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)],
     status_code=status.HTTP_204_NO_CONTENT
     )
-async def update_service(service: ServiceUpdate):
+async def update_service(service: ServiceUpdate) -> Response:
     service_dal = await begin()
     try:
         updated_service = await service_dal.update_service(service)
@@ -81,7 +81,7 @@ async def update_service(service: ServiceUpdate):
     "/{service_id}",
     dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)],
     status_code=status.HTTP_204_NO_CONTENT)
-async def delete_service(service_id: int):
+async def delete_service(service_id: int) -> Response:
     service_dal = await begin()
     await service_dal.delete_service(service_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

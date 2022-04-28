@@ -1,21 +1,21 @@
 from typing import Optional
-from hub.models.user import UserRead, ATRIBUTES_LIST
+from hub.models.user import User, ATRIBUTES_LIST
 from hub.redis.config import redis
 import asyncio
 
 
-def normalize(user_values: list[str]) -> Optional[UserRead]:
+def normalize(user_values: list[str]) -> Optional[User]:
     if user_values == [None]*len(user_values):
         return None
     else:
         user_dict = dict(zip(ATRIBUTES_LIST, user_values))
         user_dict["id"] = int(user_dict["id"])
         user_dict["is_admin"] = bool(user_dict["is_admin"])
-        return UserRead(**user_dict)
+        return User(**user_dict)
 
 
 class UserCache:
-    async def get(self, id: int) -> Optional[UserRead]:
+    async def get(self, id: int) -> Optional[User]:
         null_user, id_user = await asyncio.gather(
             redis.get(f"no-user:{id}"),
             redis.hmget(f"user:{id}", ATRIBUTES_LIST)

@@ -5,7 +5,7 @@ from hub.auth.dependencies import get_password_hash
 from hub.auth.dependencies import oauth2_scheme
 from hub.dal.user import begin
 from sqlalchemy.exc import IntegrityError
-from hub.models.user import UserRead, UserCreate, UserUpdate
+from hub.models.user import User, UserRead, UserCreate, UserUpdate
 
 
 router = APIRouter(
@@ -15,9 +15,9 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[UserRead])
-async def get_users(limit: int = 20, skip: int = 0) -> list[UserRead]:
+async def get_users(limit: int = 20, skip: int = 0) -> list[User]:
     user_dal = await begin()
-    return user_dal.get_all_users(limit, skip)
+    return await user_dal.get_all_users(limit, skip)
 
 
 @router.post('/', response_model=UserRead, status_code=status.HTTP_201_CREATED)
@@ -34,11 +34,7 @@ async def create_user(user: UserCreate) -> Response:
             )
 
 
-@router.put(
-    "/",
-    status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(get_current_user)]
-    )
+@router.put("/", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(get_current_user)])
 async def update_user(user: UserUpdate) -> Response:
     user_dal = await begin()
     try:

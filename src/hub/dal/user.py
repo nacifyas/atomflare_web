@@ -12,38 +12,30 @@ import asyncio
 def cacheNormalize(user: Union[User, UserDB]) -> dict:
     user_dict = user.dict() if isinstance(user, User) else User(**user.__dict__).dict()
     user_dict["is_admin"] = str(user.is_admin)
-    user_dict.pop("hashed_password")
     return user_dict
 
 
-def normalize(user: UserDB) -> Union[User, None]:
+def normalize_user_arr(user_arr: list[UserDB]) -> list[User]:
+    return [User(**user.__dict__) for user in user_arr]
+
+
+def normalize(user: UserDB) -> Optional[User]:
     if user is not None:
         return User(**user.__dict__)
     else:
         return None
 
 
-async def begin():
-    async with async_session() as session:
-        async with session.begin():
-            return UserDAL(session)
-
-
 class UserDAL:
     def __init__(self, db_session: Session):
         self.db_session = db_session
 
-    async def get_all_users(self, limit: int, skip: int) -> list[Optional[User]]:
+    async def get_all_users(self, limit: int, skip: int) -> list[User]:
         query = await self.db_session.execute(select(UserDB).offset(skip).limit(limit))
-        coro_arr = []
-        user_array = []
-        for user in query.scalars().all():
-            user_array.append(normalize(user))
-            coro_arr.append(
-                UserCache().set(cacheNormalize(user))
-            )
+        user_arr = normalize_user_arr(query.scalars().all())
+        coro_arr = [UserCache().set(cacheNormalize(user)) for user in user_arr]
         await asyncio.gather(*coro_arr)
-        return user_array
+        return user_arr
 
     async def get_by_username(self, username: str) -> Optional[User]:
         query = await self.db_session.execute(select(UserDB).where(UserDB.username == username))
@@ -53,12 +45,12 @@ class UserDAL:
         return user
 
     async def get_by_id(self, id: int) -> Optional[User]:
-        user_exists, user_retrieval = await asyncio.gather(
+        exists_user_cached, user_cached = await asyncio.gather(
             UserCache().exists(id),
             UserCache().get(id)
         )
-        if user_exists:
-            return user_retrieval
+        if exists_user_cached:
+            return user_cached
         else:
             query = await self.db_session.execute(select(UserDB).where(UserDB.id == id))
             user = normalize(query.scalars().first())
@@ -108,3 +100,9 @@ class UserDAL:
             UserCache().delete(id),
             UserCache().set_null(id)
         )
+
+
+async def begin() -> UserDAL:
+    async with async_session() as session:
+        async with session.begin():
+            return UserDAL(session)

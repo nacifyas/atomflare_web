@@ -2,7 +2,7 @@ from typing import Optional
 from fastapi import Query
 from pydantic import BaseModel
 
-ATRIBUTES_LIST = ["id", "username", "name", "is_admin"]
+ATRIBUTES_LIST = ["id", "username", "name", "is_admin", "hashed_password"]
 
 
 class UserBase(BaseModel):
@@ -12,7 +12,7 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    hashed_password: Optional[str]
+    hashed_password: str
 
 
 class User(UserCreate):
@@ -33,5 +33,5 @@ class UserUpdate(BaseModel):
     id: int
     username: Optional[str] = Query(None, min_length=3, max_length=10)
     name: Optional[str] = Query(None, min_length=3, max_length=10)
-    hashed_password: Optional[str] = None
+    hashed_password: Optional[str]
     is_admin: Optional[bool] = False

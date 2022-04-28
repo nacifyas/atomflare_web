@@ -22,12 +22,6 @@ def normalize(service: ServiceDB) -> Service:
         return None
 
 
-async def begin():
-    async with async_session() as session:
-        async with session.begin():
-            return ServiceDAL(session)
-
-
 class ServiceDAL():
     def __init__(self, db_session: Session):
         self.db_session = db_session
@@ -103,3 +97,9 @@ class ServiceDAL():
             ServiceCache().delete(id),
             ServiceCache().set_null(id)
         )
+
+
+async def begin() -> ServiceDAL:
+    async with async_session() as session:
+        async with session.begin():
+            return ServiceDAL(session)

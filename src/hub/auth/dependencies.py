@@ -17,7 +17,7 @@ async def get_user(username: str) -> Optional[User]:
     return await user_dal.get_by_username(username)
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -37,24 +37,23 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-def get_password_hash(password):
+def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def authenticate_user(username: str, password: str):
+async def authenticate_user(username: str, password: str) -> Optional[User]:
     user = await get_user(username)
-    if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
-        return False
-    return user
+    if user is not None and verify_password(password, user.hashed_password):
+        return None
+    else:
+        return user
 
 
-async def current_user_admin(current_user: User = Depends(get_current_user)):
+async def current_user_admin(current_user: User = Depends(get_current_user)) -> User:
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -2,7 +2,7 @@ import asyncio
 from hub.sql.database import engine, Base
 
 
-async def createdb():
+async def createdb() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
