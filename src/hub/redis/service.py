@@ -1,3 +1,4 @@
+from typing import Union
 from typing import Optional
 from hub.models.service import Service
 from hub.models.service import ATRIBUTES_LIST
@@ -9,7 +10,7 @@ def normalize(service_values: list[str]) -> Optional[Service]:
     if service_values == [None]*len(service_values):
         return None
     else:
-        service_dict = dict(zip(ATRIBUTES_LIST, service_values))
+        service_dict: dict[str, Union[str, int, bool]] = dict(zip(ATRIBUTES_LIST, service_values))
         service_dict["id"] = int(service_dict["id"])
         service_dict["is_visible"] = bool(service_dict["is_visible"])
         return Service(**service_dict)
@@ -26,11 +27,11 @@ class ServiceCache:
 
     async def set(self, service: dict) -> str:
         id = service["id"]
-        res = await asyncio.gather(
+        del_response, set_response = await asyncio.gather(
             redis.delete(f"no-service:{id}"),
             redis.hmset(f"service:{id}", service)
         )
-        return res.__str__
+        return set_response
 
     async def exists(self, id: int) -> int:
         ex, nx = await asyncio.gather(
