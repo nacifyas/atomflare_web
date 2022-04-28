@@ -1,7 +1,7 @@
+from typing import Optional
 from fastapi import HTTPException, status, Depends
 from passlib.context import CryptContext
-from hub.dal.user import UserDAL
-from hub.sql.database import async_session
+from hub.dal.user import begin
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
@@ -12,11 +12,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-async def get_user(username: str) -> User:
-    async with async_session() as session:
-        async with session.begin():
-            user_dal = UserDAL(session)
-            return await user_dal.get_by_username(username)
+async def get_user(username: str) -> Optional[User]:
+    user_dal = begin()
+    return await user_dal.get_by_username(username)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):

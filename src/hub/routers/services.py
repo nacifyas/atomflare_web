@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import Response
 from sqlalchemy.exc import IntegrityError
-from hub.dal.service import ServiceDAL
+from hub.dal.service import begin
 from hub.models.service import Service, ServiceCreate, ServiceUpdate
 from hub.auth.dependencies import oauth2_scheme, current_user_admin
 
@@ -16,7 +16,7 @@ router = APIRouter(
     status_code=status.HTTP_200_OK
     )
 async def get_services(limit: int = 50, skip: int = 0) -> list[Service]:
-    service_dal = await ServiceDAL.begin()
+    service_dal = await begin()
     return await service_dal.get_all_services(limit, skip)
 
 
@@ -26,7 +26,7 @@ async def get_services(limit: int = 50, skip: int = 0) -> list[Service]:
     status_code=status.HTTP_200_OK
     )
 async def get_service_by_id(service_id: int) -> Service:
-    service_dal = await ServiceDAL.begin()
+    service_dal = await begin()
     ret = await service_dal.get_by_id(service_id)
     if ret is None:
         raise HTTPException(
@@ -44,7 +44,7 @@ async def get_service_by_id(service_id: int) -> Service:
     status_code=status.HTTP_201_CREATED
     )
 async def create_service(service: ServiceCreate) -> Service:
-    service_dal = await ServiceDAL.begin()
+    service_dal = await begin()
     try:
         return await service_dal.create_service(service)
     except IntegrityError as e:
@@ -60,7 +60,7 @@ async def create_service(service: ServiceCreate) -> Service:
     status_code=status.HTTP_204_NO_CONTENT
     )
 async def update_service(service: ServiceUpdate):
-    service_dal = await ServiceDAL.begin()
+    service_dal = await begin()
     try:
         updated_service = await service_dal.update_service(service)
     except IntegrityError as e:
@@ -82,6 +82,6 @@ async def update_service(service: ServiceUpdate):
     dependencies=[Depends(oauth2_scheme), Depends(current_user_admin)],
     status_code=status.HTTP_204_NO_CONTENT)
 async def delete_service(service_id: int):
-    service_dal = await ServiceDAL.begin()
+    service_dal = await begin()
     await service_dal.delete_service(service_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

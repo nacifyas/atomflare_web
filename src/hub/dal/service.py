@@ -22,14 +22,15 @@ def normalize(service: ServiceDB) -> Service:
         return None
 
 
+async def begin():
+    async with async_session() as session:
+        async with session.begin():
+            return ServiceDAL(session)
+
+
 class ServiceDAL():
     def __init__(self, db_session: Session):
         self.db_session = db_session
-
-    async def begin():
-        async with async_session() as session:
-            async with session.begin():
-                return ServiceDAL(session)
 
     async def get_all_services(self, limit: int, skip: int) -> list[Service]:
         query = await self.db_session.execute(select(ServiceDB).offset(skip).limit(limit))
@@ -69,27 +70,26 @@ class ServiceDAL():
     async def update_service(self, service: ServiceUpdate) -> Service:
         old_service = await self.get_by_id(service.id)
         if old_service is not None:
-            service_updated = normalize(old_service)
             query = update(ServiceDB).where(ServiceDB.id == service.id)
             if service.name:
                 query = query.values(name=service.name)
-                service_updated.name = service.name
+                old_service.name = service.name
             if service.description:
                 query = query.values(description=service.description)
-                service_updated.description = service.description
+                old_service.description = service.description
             if service.logo:
                 query = query.values(logo=service.logo)
-                service_updated.logo = service.logo
+                old_service.logo = service.logo
             if service.link:
                 query = query.values(link=service.link)
-                service_updated.link = service.link
+                old_service.link = service.link
             if service.is_visible is not None:
                 query = query.values(is_visible=service.is_visible)
-                service_updated.is_visible = service.is_visible
+                old_service.is_visible = service.is_visible
             query.execution_options(synchronize_session="fetch")
             await self.db_session.execute(query)
-            await ServiceCache.set(cacheNormalize(service_updated))
-            return service_updated
+            await ServiceCache.set(cacheNormalize(old_service))
+            return old_service
         else:
             await ServiceCache.set_null(service.id)
             return None
