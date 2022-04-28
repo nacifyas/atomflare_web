@@ -2,7 +2,6 @@ from typing import Optional, Union
 from sqlalchemy.orm import Session
 from hub.sql.sqlmodels import UserDB
 from hub.redis.user import UserCache
-from hub.sql.database import async_session
 from hub.models.user import User, UserCreate, UserUpdate
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
