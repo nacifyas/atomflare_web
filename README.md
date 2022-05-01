@@ -1,4 +1,4 @@
-[![Tests](https://github.com/nacifyas/atomflare_web/actions/workflows/test.yaml/badge.svg)](https://github.com/nacifyas/atomflare_web/actions/workflows/test.yaml)
+[![Build](https://github.com/nacifyas/atomflare_web/actions/workflows/flake8-mypy-build.yaml/badge.svg)](https://github.com/nacifyas/atomflare_web/actions/workflows/flake8-mypy-build.yaml)
 [![CodeQL](https://github.com/nacifyas/atomflare_web/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/nacifyas/atomflare_web/actions/workflows/codeql-analysis.yml)
 # Atomflare Web
 
