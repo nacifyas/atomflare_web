@@ -1,4 +1,4 @@
-name: Tests
+name: Structure
 on:
   - push
   - pull_request
@@ -27,5 +27,3 @@ jobs:
       run: pytest tests
     - name: Tests with flake8
       run: flake8 src --max-line-length=146
-    - name: Tests with mypy
-      run: mypy src
