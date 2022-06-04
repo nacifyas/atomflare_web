@@ -9,7 +9,6 @@ app.include_router(services.router)
 app.include_router(users.router)
 app.include_router(auths.router)
 
-#####################
 
 @app.get("/initialize_db")
 async def createdb() -> str:
